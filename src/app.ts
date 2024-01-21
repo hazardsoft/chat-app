@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from "node:url";
 
 const app = express();
 app.use(express.json());

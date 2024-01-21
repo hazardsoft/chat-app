@@ -13,6 +13,6 @@ export default [
       },
     ],
     plugins: [typescript()],
-    external: [],
+    external: ["express", "cors", "node:url"],
   },
 ];
