@@ -10,7 +10,11 @@ io.on("connection", (socket) => {
   socket.on("disconnect", (reason) => {
     console.log(`socket ${socket.id} disconnected due to ${reason}`);
   });
-  socket.emit("counterUpdated", 1);
+  socket.emit("message", "Welcome!");
+  socket.on("message", (message) => {
+    console.log(`Message received from ${socket.id}: ${message}`);
+    socket.broadcast.emit("message", message);
+  });
 });
 server.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}.`);
