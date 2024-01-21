@@ -19,13 +19,17 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("message", message);
   });
 
-  socket.on("location", (coords: Coordinates) => {
-    console.log(`Location received from ${socket.id}:`, coords);
-    socket.broadcast.emit(
-      "message",
-      `https://maps.google.com/maps?q=${coords.latitude},${coords.longitude}`,
-    );
-  });
+  socket.on(
+    "location",
+    (coords: Coordinates, ackCallback: (error?: Error) => void) => {
+      console.log(`Location received from ${socket.id}:`, coords);
+      socket.broadcast.emit(
+        "message",
+        `https://maps.google.com/maps?q=${coords.latitude},${coords.longitude}`,
+      );
+      ackCallback();
+    },
+  );
 
   socket.emit("message", "Welcome!");
 });

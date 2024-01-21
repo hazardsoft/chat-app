@@ -21,8 +21,14 @@ const submitMessage = (event) => {
 };
 const submitLocation = (event) => {
     event.preventDefault();
-    console.log(`Location sent!`, coords);
-    socket.emit("location", coords);
+    console.log(`Sending location...`, coords);
+    socket.emit("location", coords, (error) => {
+        if (error) {
+            console.log(`Error sending location:`, error);
+            return;
+        }
+        console.log(`Location sent!`);
+    });
 };
 const messageForm = document.getElementById("message-form");
 messageForm.addEventListener("submit", submitMessage);
