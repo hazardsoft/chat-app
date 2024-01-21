@@ -8,9 +8,10 @@ socket.on("disconnect", () => {
     console.log(`Client disconnected from the server`);
 });
 socket.on("message", (message) => {
-    console.log(`Message received from the server: ${message}`);
+    console.log(`Message received from the server:`, message);
 });
-const submitForm = (event) => {
+let coords;
+const submitMessage = (event) => {
     event.preventDefault();
     const form = event.target;
     const input = form.elements.namedItem("message");
@@ -18,6 +19,26 @@ const submitForm = (event) => {
     console.log(`Message (${message}) sent!`);
     socket.emit("message", message);
 };
-const form = document.getElementById("messageForm");
-form.addEventListener("submit", submitForm);
+const submitLocation = (event) => {
+    event.preventDefault();
+    console.log(`Location sent!`, coords);
+    socket.emit("location", coords);
+};
+const messageForm = document.getElementById("message-form");
+messageForm.addEventListener("submit", submitMessage);
+const p = document.getElementById("location");
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+        coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+        };
+        p.textContent = `Long: ${coords.longitude}, Lat: ${coords.latitude}`;
+        const locationForm = document.getElementById("location-form");
+        locationForm.addEventListener("submit", submitLocation);
+    }, (positionError) => {
+        p.textContent = `Error getting location: ${positionError.message}`;
+    });
+}
 //# sourceMappingURL=chat.js.map

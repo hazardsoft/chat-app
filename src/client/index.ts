@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import { Coordinates } from "./types";
 
 const socket = io();
 socket.on("connect", () => {
@@ -8,10 +9,12 @@ socket.on("disconnect", () => {
   console.log(`Client disconnected from the server`);
 });
 socket.on("message", (message: string) => {
-  console.log(`Message received from the server: ${message}`);
+  console.log(`Message received from the server:`, message);
 });
 
-const submitForm = (event: SubmitEvent) => {
+let coords: Coordinates;
+
+const submitMessage = (event: SubmitEvent) => {
   event.preventDefault();
   const form = event.target as HTMLFormElement;
   const input = form.elements.namedItem("message") as HTMLInputElement;
@@ -21,5 +24,35 @@ const submitForm = (event: SubmitEvent) => {
   socket.emit("message", message);
 };
 
-const form = document.getElementById("messageForm") as HTMLFormElement;
-form.addEventListener("submit", submitForm);
+const submitLocation = (event: SubmitEvent) => {
+  event.preventDefault();
+
+  console.log(`Location sent!`, coords);
+  socket.emit("location", coords);
+};
+
+const messageForm = document.getElementById("message-form") as HTMLFormElement;
+messageForm.addEventListener("submit", submitMessage);
+
+const p = document.getElementById("location") as HTMLParagraphElement;
+
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      coords = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+      p.textContent = `Long: ${coords.longitude}, Lat: ${coords.latitude}`;
+
+      const locationForm = document.getElementById(
+        "location-form",
+      ) as HTMLFormElement;
+      locationForm.addEventListener("submit", submitLocation);
+    },
+    (positionError) => {
+      p.textContent = `Error getting location: ${positionError.message}`;
+    },
+  );
+}
