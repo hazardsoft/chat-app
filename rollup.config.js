@@ -13,7 +13,7 @@ export default [
       },
     ],
     plugins: [typescript()],
-    external: ["express", "cors", "node:url"],
+    external: ["express", "cors", "node:url", "node:http", "socket.io"],
   },
   {
     input: "src/client/index.ts",

@@ -5,7 +5,7 @@
     <script type="importmap">
       {
         "imports": {
-          "socket.io-client": "https://cdn.socket.io/4.7.4/socket.io.esm.min.js"
+          "socket.io-client": "https://unpkg.com/socket.io@4.7.4/client-dist/socket.io.esm.min.js"
         }
       }
     </script>
@@ -13,13 +13,15 @@
   <body>
     <h1>Chat App</h1>
     <script type="module" src="/js/chat.js"></script>
+
     <form id="message-form">
-      <input type="text" name="message" placeholder="Message" />
-      <button>Send Message</button>
+      <input type="text" name="message" placeholder="Type your message:" />
+      <button name="submit">Send Message</button>
     </form>
+
     <form id="location-form">
-      <p id="location">Getting location...</p>
-      <button>Send Location</button>
+      <p>Getting location...</p>
+      <button name="submit">Send Location</button>
     </form>
   </body>
 </html>

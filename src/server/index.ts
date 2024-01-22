@@ -14,10 +14,14 @@ io.on("connection", (socket) => {
     );
   });
 
-  socket.on("message", (message: string) => {
-    console.log(`Message received from ${socket.id}:`, message);
-    socket.broadcast.emit("message", message);
-  });
+  socket.on(
+    "message",
+    (message: string, ackCallback: (error?: Error) => void) => {
+      console.log(`Message received from ${socket.id}:`, message);
+      socket.broadcast.emit("message", message);
+      ackCallback();
+    },
+  );
 
   socket.on(
     "location",
