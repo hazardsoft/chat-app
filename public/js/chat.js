@@ -33,20 +33,21 @@ const submitMessage = (event) => {
         button$1.disabled = false;
     });
 };
-const form$1 = document.getElementById("message-form");
-const input = form$1.elements.namedItem("message");
-const button$1 = form$1.elements.namedItem("submit");
-form$1.addEventListener("submit", submitMessage);
+const form = document.getElementById("message-form");
+const input = form.elements.namedItem("message");
+const button$1 = form.elements.namedItem("submit");
+form.addEventListener("submit", submitMessage);
 
 let coords;
 let socket$1;
+let labelTimeout;
 const setSocket = (s) => {
     socket$1 = s;
     detectCurrentPosition();
 };
-const submitLocation = (event) => {
-    event.preventDefault();
+const submitLocation = () => {
     console.log("Sending location...", coords);
+    button.textContent = "Sending...";
     button.disabled = true;
     socket$1.emit(MessageType.cs.location, coords, (error) => {
         if (error) {
@@ -55,6 +56,11 @@ const submitLocation = (event) => {
         }
         console.log(`Location sent!`);
         button.disabled = false;
+        button.textContent = "Location sent!";
+        clearTimeout(labelTimeout);
+        labelTimeout = setTimeout(() => {
+            button.textContent = "Send location";
+        }, 900);
     });
 };
 const detectCurrentPosition = () => {
@@ -63,35 +69,35 @@ const detectCurrentPosition = () => {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
         };
-        p.textContent = `Long: ${coords.longitude}, Lat: ${coords.latitude}`;
+        button.textContent = "Send location";
         button.disabled = false;
     }, (positionError) => {
-        p.textContent = `Error getting location: ${positionError.message}`;
+        button.textContent = `Error getting location: ${positionError.message}`;
         button.disabled = true;
     });
 };
-const form = document.getElementById("location-form");
-const p = form.querySelector("p");
-const button = form.elements.namedItem("submit");
+const button = document.getElementById("send-location-btn");
 button.disabled = true;
-form.addEventListener("submit", submitLocation);
+button.addEventListener("click", submitLocation);
 
 const messages = document.getElementById("messages");
 const messageTemplate = document.getElementById("message-template");
 const locationMessageTemplate = document.getElementById("location-message-template");
 const addMessage = (payload) => {
-    const { message, createdAt } = payload;
+    const { message, createdAt, name } = payload;
     const html = mustache.render(messageTemplate.innerHTML, {
         message,
         createdAt: moment(createdAt).format("h:mm a"),
+        creator: name,
     });
     messages.insertAdjacentHTML("beforeend", html);
 };
 const addLocationMessage = (payload) => {
-    const { createdAt, url } = payload;
+    const { createdAt, url, name } = payload;
     const html = mustache.render(locationMessageTemplate.innerHTML, {
         createdAt: moment(createdAt).format("h:mm a"),
         url,
+        creator: name,
     });
     messages.insertAdjacentHTML("beforeend", html);
 };

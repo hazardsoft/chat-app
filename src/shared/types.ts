@@ -7,12 +7,18 @@ type CreatedAt = {
   createdAt: number;
 };
 
+type Creator = {
+  name: string;
+};
+
 type Message = {
   message: string;
-} & CreatedAt;
+} & CreatedAt &
+  Creator;
 
 type LocationMessage = {
   url: string;
-} & CreatedAt;
+} & CreatedAt &
+  Creator;
 
 export { Coordinates, Message, LocationMessage };

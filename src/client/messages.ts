@@ -11,19 +11,21 @@ const locationMessageTemplate = document.getElementById(
 ) as HTMLTemplateElement;
 
 const addMessage = (payload: Message) => {
-  const { message, createdAt } = payload;
+  const { message, createdAt, name } = payload;
   const html: string = mustache.render(messageTemplate.innerHTML, {
     message,
     createdAt: moment(createdAt).format("h:mm a"),
+    creator: name,
   });
   messages.insertAdjacentHTML("beforeend", html);
 };
 
 const addLocationMessage = (payload: LocationMessage) => {
-  const { createdAt, url } = payload;
+  const { createdAt, url, name } = payload;
   const html = mustache.render(locationMessageTemplate.innerHTML, {
     createdAt: moment(createdAt).format("h:mm a"),
     url,
+    creator: name,
   });
   messages.insertAdjacentHTML("beforeend", html);
 };

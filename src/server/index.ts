@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
     MessageType.cs.message,
     (message: string, ackCallback: (error?: Error) => void) => {
       console.log(`Message received from ${socket.id}:`, message);
-      io.emit(MessageType.sc.message, generateMessage(message));
+      io.emit(MessageType.sc.message, generateMessage(message, socket.id));
       ackCallback();
     },
   );
@@ -40,13 +40,17 @@ io.on("connection", (socket) => {
         MessageType.sc.location,
         generateLocationMessage(
           `https://maps.google.com/maps?q=${coords.latitude},${coords.longitude}`,
+          socket.id,
         ),
       );
       ackCallback();
     },
   );
 
-  socket.emit(MessageType.sc.message, generateMessage("Welcome!"));
+  socket.emit(
+    MessageType.sc.message,
+    generateMessage(`Welcome, ${socket.id}`, "Server"),
+  );
 });
 server.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}.`);

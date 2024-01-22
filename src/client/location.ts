@@ -4,16 +4,16 @@ import { MessageType } from "../shared/consts";
 
 let coords: Coordinates;
 let socket: Socket;
+let labelTimeout: number;
 
 const setSocket = (s: Socket) => {
   socket = s;
   detectCurrentPosition();
 };
 
-const submitLocation = (event: SubmitEvent) => {
-  event.preventDefault();
-
+const submitLocation = () => {
   console.log("Sending location...", coords);
+  button.textContent = "Sending...";
   button.disabled = true;
   socket.emit(MessageType.cs.location, coords, (error?: Error) => {
     if (error) {
@@ -22,6 +22,11 @@ const submitLocation = (event: SubmitEvent) => {
     }
     console.log(`Location sent!`);
     button.disabled = false;
+    button.textContent = "Location sent!";
+    clearTimeout(labelTimeout);
+    labelTimeout = setTimeout(() => {
+      button.textContent = "Send location";
+    }, 900) as unknown as number;
   });
 };
 
@@ -32,20 +37,20 @@ const detectCurrentPosition = () => {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       };
-      p.textContent = `Long: ${coords.longitude}, Lat: ${coords.latitude}`;
+      button.textContent = "Send location";
       button.disabled = false;
     },
     (positionError) => {
-      p.textContent = `Error getting location: ${positionError.message}`;
+      button.textContent = `Error getting location: ${positionError.message}`;
       button.disabled = true;
     },
   );
 };
 
-const form = document.getElementById("location-form") as HTMLFormElement;
-const p = form.querySelector("p") as HTMLParagraphElement;
-const button = form.elements.namedItem("submit") as HTMLButtonElement;
+const button = document.getElementById(
+  "send-location-btn",
+) as HTMLButtonElement;
 button.disabled = true;
-form.addEventListener("submit", submitLocation);
+button.addEventListener("click", submitLocation);
 
 export { setSocket };
