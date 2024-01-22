@@ -5,14 +5,21 @@
     <script type="importmap">
       {
         "imports": {
-          "socket.io-client": "https://unpkg.com/socket.io@4.7.4/client-dist/socket.io.esm.min.js"
+          "socket.io-client": "https://unpkg.com/socket.io@4.7.4/client-dist/socket.io.esm.min.js",
+          "mustache": "https://unpkg.com/mustache@4.2.0/mustache.mjs"
         }
       }
     </script>
   </head>
   <body>
-    <h1>Chat App</h1>
     <script type="module" src="/js/chat.js"></script>
+    <template id="message-template">
+      <p>Message: {{ message }}</p>
+    </template>
+
+    <h1>Chat App</h1>
+
+    <div id="messages"></div>
 
     <form id="message-form">
       <input type="text" name="message" placeholder="Type your message:" />

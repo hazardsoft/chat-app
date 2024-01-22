@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import mustache from 'mustache';
 
 let socket$2;
 const setSocket$1 = (s) => {
@@ -63,6 +64,14 @@ const button = form.elements.namedItem("submit");
 button.disabled = true;
 form.addEventListener("submit", submitLocation);
 
+const messages = document.getElementById("messages");
+const messageTemplate = document.getElementById("message-template");
+const addMessage = (message) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const html = mustache.render(messageTemplate.innerHTML, { message });
+    messages.insertAdjacentHTML("beforeend", html);
+};
+
 const socket = io();
 socket.on("connect", () => {
     console.log(`Client connected to the server`);
@@ -72,6 +81,7 @@ socket.on("disconnect", () => {
 });
 socket.on("message", (message) => {
     console.log(`Message received from the server:`, message);
+    addMessage(message);
 });
 setSocket$1(socket);
 setSocket(socket);
