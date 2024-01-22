@@ -25,6 +25,6 @@ export default [
       },
     ],
     plugins: [typescript()],
-    external: ["socket.io-client"],
+    external: ["socket.io-client", "mustache"],
   },
 ];

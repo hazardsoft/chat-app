@@ -13,8 +13,15 @@
   </head>
   <body>
     <script type="module" src="/js/chat.js"></script>
+
     <template id="message-template">
-      <p>Message: {{ message }}</p>
+      <p>{{createdAt}} - {{ message }}</p>
+    </template>
+
+    <template id="location-message-template">
+      <p>
+        {{createdAt}} - <a href="{{url}}" target="_blank">Shared location</a>
+      </p>
     </template>
 
     <h1>Chat App</h1>

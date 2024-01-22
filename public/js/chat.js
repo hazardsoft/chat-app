@@ -1,6 +1,17 @@
 import { io } from 'socket.io-client';
 import mustache from 'mustache';
 
+const MessageType = {
+    cs: {
+        message: "clientMessage",
+        location: "clientLocation",
+    },
+    sc: {
+        message: "serverMessage",
+        location: "serverLocation",
+    },
+};
+
 let socket$2;
 const setSocket$1 = (s) => {
     socket$2 = s;
@@ -10,7 +21,7 @@ const submitMessage = (event) => {
     const message = input.value;
     button$1.disabled = true;
     console.log("Sending message...", message);
-    socket$2.emit("message", message, (error) => {
+    socket$2.emit(MessageType.cs.message, message, (error) => {
         if (error) {
             console.error(`Error sending message:`, error);
             return;
@@ -36,7 +47,7 @@ const submitLocation = (event) => {
     event.preventDefault();
     console.log("Sending location...", coords);
     button.disabled = true;
-    socket$1.emit("location", coords, (error) => {
+    socket$1.emit(MessageType.cs.location, coords, (error) => {
         if (error) {
             console.log(`Error sending location:`, error);
             return;
@@ -66,9 +77,21 @@ form.addEventListener("submit", submitLocation);
 
 const messages = document.getElementById("messages");
 const messageTemplate = document.getElementById("message-template");
-const addMessage = (message) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const html = mustache.render(messageTemplate.innerHTML, { message });
+const locationMessageTemplate = document.getElementById("location-message-template");
+const addMessage = (payload) => {
+    const { message, createdAt } = payload;
+    const html = mustache.render(messageTemplate.innerHTML, {
+        message,
+        createdAt,
+    });
+    messages.insertAdjacentHTML("beforeend", html);
+};
+const addLocationMessage = (payload) => {
+    const { createdAt, url } = payload;
+    const html = mustache.render(locationMessageTemplate.innerHTML, {
+        createdAt,
+        url,
+    });
     messages.insertAdjacentHTML("beforeend", html);
 };
 
@@ -79,9 +102,13 @@ socket.on("connect", () => {
 socket.on("disconnect", () => {
     console.log(`Client disconnected from the server`);
 });
-socket.on("message", (message) => {
-    console.log(`Message received from the server:`, message);
-    addMessage(message);
+socket.on(MessageType.sc.message, (payload) => {
+    console.log(`Message received from the server:`, payload);
+    addMessage(payload);
+});
+socket.on(MessageType.sc.location, (payload) => {
+    console.log(`Location message received from the server:`, payload);
+    addLocationMessage(payload);
 });
 setSocket$1(socket);
 setSocket(socket);

@@ -1,41 +1,52 @@
 import http from "node:http";
 import { Server } from "socket.io";
 import { app } from "./app.js";
-import { Coordinates } from "../client/types.js";
+import { Coordinates } from "../shared/types.js";
+import { MessageType } from "../shared/consts.js";
+import {
+  generateLocationMessage,
+  generateMessage,
+} from "../utils/generator.js";
 
 const server = http.createServer(app);
 const io = new Server(server);
 io.on("connection", (socket) => {
-  socket.broadcast.emit("message", `User ${socket.id} has joined`);
+  socket.broadcast.emit(
+    MessageType.sc.message,
+    generateMessage(`User ${socket.id} has joined`),
+  );
+
   socket.on("disconnect", (reason) => {
     socket.broadcast.emit(
-      "message",
-      `User ${socket.id} has left due to ${reason}`,
+      MessageType.sc.message,
+      generateMessage(`User ${socket.id} has left due to ${reason}`),
     );
   });
 
   socket.on(
-    "message",
+    MessageType.cs.message,
     (message: string, ackCallback: (error?: Error) => void) => {
       console.log(`Message received from ${socket.id}:`, message);
-      socket.broadcast.emit("message", message);
+      io.emit(MessageType.sc.message, generateMessage(message));
       ackCallback();
     },
   );
 
   socket.on(
-    "location",
+    MessageType.cs.location,
     (coords: Coordinates, ackCallback: (error?: Error) => void) => {
       console.log(`Location received from ${socket.id}:`, coords);
-      socket.broadcast.emit(
-        "message",
-        `https://maps.google.com/maps?q=${coords.latitude},${coords.longitude}`,
+      io.emit(
+        MessageType.sc.location,
+        generateLocationMessage(
+          `https://maps.google.com/maps?q=${coords.latitude},${coords.longitude}`,
+        ),
       );
       ackCallback();
     },
   );
 
-  socket.emit("message", "Welcome!");
+  socket.emit(MessageType.sc.message, generateMessage("Welcome!"));
 });
 server.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}.`);

@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client";
-import { Coordinates } from "./types";
+import { Coordinates } from "../shared/types";
+import { MessageType } from "../shared/consts";
 
 let coords: Coordinates;
 let socket: Socket;
@@ -14,7 +15,7 @@ const submitLocation = (event: SubmitEvent) => {
 
   console.log("Sending location...", coords);
   button.disabled = true;
-  socket.emit("location", coords, (error?: Error) => {
+  socket.emit(MessageType.cs.location, coords, (error?: Error) => {
     if (error) {
       console.log(`Error sending location:`, error);
       return;

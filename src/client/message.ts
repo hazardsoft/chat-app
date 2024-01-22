@@ -1,4 +1,5 @@
 import { Socket } from "socket.io-client";
+import { MessageType } from "../shared/consts";
 
 let socket: Socket;
 
@@ -12,7 +13,7 @@ const submitMessage = (event: SubmitEvent) => {
   const message: string = input.value;
   button.disabled = true;
   console.log("Sending message...", message);
-  socket.emit("message", message, (error?: Error): void => {
+  socket.emit(MessageType.cs.message, message, (error?: Error): void => {
     if (error) {
       console.error(`Error sending message:`, error);
       return;
