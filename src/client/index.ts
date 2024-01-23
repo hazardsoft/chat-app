@@ -2,12 +2,22 @@ import { io } from "socket.io-client";
 import { setSocket as setMessageSocket } from "./message.js";
 import { setSocket as setLocationSocket } from "./location.js";
 import { addLocationMessage, addMessage } from "./messages.js";
-import { LocationMessage, Message } from "../shared/types.js";
+import { Connection, LocationMessage, Message } from "../shared/types.js";
 import { MessageType } from "../shared/consts.js";
+import { getConnectionProps } from "./connection.js";
 
 const socket = io();
 socket.on("connect", () => {
-  console.log(`Client connected to the server`);
+  const connection: Connection = getConnectionProps();
+  console.log(`Client connected to the server`, connection);
+
+  socket.emit(MessageType.cs.join, connection, (error?: Error) => {
+    if (error) {
+      console.error(`Error joining the room:`, error);
+      return;
+    }
+    console.log(`Room joined successfully`);
+  });
 });
 socket.on("disconnect", () => {
   console.log(`Client disconnected from the server`);

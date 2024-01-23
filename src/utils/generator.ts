@@ -13,7 +13,7 @@ const generateMessage = (
 
 const generateLocationMessage = (
   url: string,
-  creator: string,
+  creator: string = "Server",
 ): LocationMessage => {
   return {
     url,

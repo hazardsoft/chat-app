@@ -21,4 +21,13 @@ type LocationMessage = {
 } & CreatedAt &
   Creator;
 
-export { Coordinates, Message, LocationMessage };
+type User = {
+  name: string;
+};
+
+type Connection = {
+  user: User;
+  room: string;
+};
+
+export { Coordinates, Message, LocationMessage, Connection, User };

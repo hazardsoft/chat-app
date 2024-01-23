@@ -6,6 +6,7 @@ const MessageType = {
     cs: {
         message: "clientMessage",
         location: "clientLocation",
+        join: "clientJoin",
     },
     sc: {
         message: "serverMessage",
@@ -102,9 +103,30 @@ const addLocationMessage = (payload) => {
     messages.insertAdjacentHTML("beforeend", html);
 };
 
+const getConnectionProps = () => {
+    const searchParams = new URLSearchParams(location.search);
+    const username = searchParams.get("username") ?? "";
+    const room = searchParams.get("room") ?? "";
+    const connection = {
+        user: {
+            name: username,
+        },
+        room,
+    };
+    return connection;
+};
+
 const socket = io();
 socket.on("connect", () => {
-    console.log(`Client connected to the server`);
+    const connection = getConnectionProps();
+    console.log(`Client connected to the server`, connection);
+    socket.emit(MessageType.cs.join, connection, (error) => {
+        if (error) {
+            console.error(`Error joining the room:`, error);
+            return;
+        }
+        console.log(`Room joined successfully`);
+    });
 });
 socket.on("disconnect", () => {
     console.log(`Client disconnected from the server`);
