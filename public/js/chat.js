@@ -85,6 +85,20 @@ button.addEventListener("click", submitLocation);
 const messages = document.getElementById("messages");
 const messageTemplate = document.getElementById("message-template");
 const locationMessageTemplate = document.getElementById("location-message-template");
+const autoscroll = () => {
+    const newMessage = messages.lastElementChild;
+    const { marginBottom, marginTop } = getComputedStyle(newMessage);
+    const newMessageMargin = parseInt(marginBottom) + parseInt(marginTop);
+    const newMessageHeight = newMessage.offsetHeight + newMessageMargin;
+    console.log(`new message height: ${newMessageHeight}`);
+    const visibleHeight = messages.offsetHeight;
+    const containerHeight = messages.scrollHeight;
+    const scrollOffset = visibleHeight + messages.scrollTop;
+    const wasScrolledToTheBottom = containerHeight - newMessageHeight <= Math.ceil(scrollOffset);
+    if (wasScrolledToTheBottom) {
+        messages.scrollTop = messages.scrollHeight;
+    }
+};
 const addMessage = (payload) => {
     const { message, createdAt, name } = payload;
     const html = mustache.render(messageTemplate.innerHTML, {
@@ -93,6 +107,7 @@ const addMessage = (payload) => {
         creator: name,
     });
     messages.insertAdjacentHTML("beforeend", html);
+    autoscroll();
 };
 const addLocationMessage = (payload) => {
     const { createdAt, url, name } = payload;
@@ -102,6 +117,7 @@ const addLocationMessage = (payload) => {
         creator: name,
     });
     messages.insertAdjacentHTML("beforeend", html);
+    autoscroll();
 };
 
 const getConnectionProps = () => {
