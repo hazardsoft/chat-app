@@ -7,6 +7,7 @@ const MessageType = {
   sc: {
     message: "serverMessage",
     location: "serverLocation",
+    roomMeta: "serverRoomMeta",
   },
 } as const;
 

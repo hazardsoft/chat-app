@@ -1,18 +1,18 @@
 import { Server, Socket } from "socket.io";
-import { User } from "../shared/types";
+import { Connection, User } from "../shared/types";
 
-const users: Map<Socket, User> = new Map();
+const connections: Map<Socket, Connection> = new Map();
 
-const registerUser = (socket: Socket, user: User) => {
-  users.set(socket, user);
+const registerConnection = (socket: Socket, connection: Connection) => {
+  connections.set(socket, connection);
 };
 
-const removeUser = (socket: Socket) => {
-  users.delete(socket);
+const removeConnection = (socket: Socket) => {
+  connections.delete(socket);
 };
 
-const getUser = (socket: Socket): User | undefined => {
-  return users.get(socket);
+const getConnection = (socket: Socket): Connection | undefined => {
+  return connections.get(socket);
 };
 
 const getBroadcasterForAllSockets = (
@@ -31,10 +31,26 @@ const getBroadcasterForAllSocketsExceptSender = (
   return socket.to(roomIds);
 };
 
+const getUsersInRoomWithSocket = async (
+  io: Server,
+  socket: Socket,
+): Promise<User[]> => {
+  const rooms = socket.rooms;
+  const socketIds = await io.sockets.adapter.sockets(rooms);
+  const usersInRoom: User[] = [];
+  connections.forEach((connection, socket) => {
+    if (socketIds.has(socket.id)) {
+      usersInRoom.push(connection.user);
+    }
+  });
+  return usersInRoom;
+};
+
 export {
   getBroadcasterForAllSockets,
   getBroadcasterForAllSocketsExceptSender,
-  registerUser,
-  removeUser,
-  getUser,
+  registerConnection,
+  removeConnection,
+  getConnection,
+  getUsersInRoomWithSocket,
 };

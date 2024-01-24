@@ -25,9 +25,16 @@ type User = {
   name: string;
 };
 
+type RoomId = string;
+
 type Connection = {
   user: User;
-  room: string;
+  roomId: RoomId;
 };
 
-export { Coordinates, Message, LocationMessage, Connection, User };
+type RoomMeta = {
+  roomId: RoomId;
+  users: User[];
+};
+
+export { Coordinates, Message, LocationMessage, Connection, User, RoomMeta };

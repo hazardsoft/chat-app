@@ -2,9 +2,15 @@ import { io } from "socket.io-client";
 import { setSocket as setMessageSocket } from "./message.js";
 import { setSocket as setLocationSocket } from "./location.js";
 import { addLocationMessage, addMessage } from "./messages.js";
-import { Connection, LocationMessage, Message } from "../shared/types.js";
+import {
+  Connection,
+  LocationMessage,
+  Message,
+  RoomMeta,
+} from "../shared/types.js";
 import { MessageType } from "../shared/consts.js";
 import { getConnectionProps } from "./connection.js";
+import { setUsers } from "./sidebar.js";
 
 const socket = io();
 socket.on("connect", () => {
@@ -30,6 +36,11 @@ socket.on(MessageType.sc.message, (payload: Message) => {
 socket.on(MessageType.sc.location, (payload: LocationMessage) => {
   console.log(`Location message received from the server:`, payload);
   addLocationMessage(payload);
+});
+
+socket.on(MessageType.sc.roomMeta, (payload: RoomMeta) => {
+  console.log(`Rooms meta received from the server:`, payload);
+  setUsers(payload.roomId, payload.users);
 });
 
 setMessageSocket(socket);

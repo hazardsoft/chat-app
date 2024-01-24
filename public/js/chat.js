@@ -11,6 +11,7 @@ const MessageType = {
     sc: {
         message: "serverMessage",
         location: "serverLocation",
+        roomMeta: "serverRoomMeta",
     },
 };
 
@@ -106,14 +107,21 @@ const addLocationMessage = (payload) => {
 const getConnectionProps = () => {
     const searchParams = new URLSearchParams(location.search);
     const username = searchParams.get("username") ?? "";
-    const room = searchParams.get("room") ?? "";
+    const roomId = searchParams.get("room") ?? "";
     const connection = {
         user: {
             name: username,
         },
-        room,
+        roomId,
     };
     return connection;
+};
+
+const sidebarTemplate = document.getElementById("sidebar-template");
+const sidebar = document.getElementById("sidebar");
+const setUsers = (roomId, users) => {
+    const html = mustache.render(sidebarTemplate.innerHTML, { roomId, users });
+    sidebar.innerHTML = html;
 };
 
 const socket = io();
@@ -138,6 +146,10 @@ socket.on(MessageType.sc.message, (payload) => {
 socket.on(MessageType.sc.location, (payload) => {
     console.log(`Location message received from the server:`, payload);
     addLocationMessage(payload);
+});
+socket.on(MessageType.sc.roomMeta, (payload) => {
+    console.log(`Rooms meta received from the server:`, payload);
+    setUsers(payload.roomId, payload.users);
 });
 setSocket$1(socket);
 setSocket(socket);
